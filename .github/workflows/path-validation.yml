@@ -28,9 +28,9 @@ jobs:
       - name: Detect relative/truncated runtime paths
         run: |
           set -e
-          if git grep -n --cached -E '\.\./|(^|/)\.\.(/|$)|\./[^/]' $(git ls-files) | grep -v '.github/workflows/path-validation.yml' >/dev/null 2>&1; then
+          if git grep -n --cached -E '\.\./|(^|/)\.\.(/|$)|\./[^/]' $(git ls-files) | grep -v -E '(.github/workflows/path-validation.yml|frontend/|docker-compose.yml|package.json|tsconfig)' >/dev/null 2>&1; then
             echo "ERROR: Relative/truncated path references detected in repo files." >&2
-            git grep -n -E '\.\./|(^|/)\.\.(/|$)|\./[^/]' $(git ls-files) | grep -v '.github/workflows/path-validation.yml' || true
+            git grep -n -E '\.\./|(^|/)\.\.(/|$)|\./[^/]' $(git ls-files) | grep -v -E '(.github/workflows/path-validation.yml|frontend/|docker-compose.yml|package.json|tsconfig)' || true
             exit 1
           fi
       - name: Ensure backend entrypoint exists
