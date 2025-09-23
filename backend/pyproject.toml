@@ -6,7 +6,7 @@ authors = ["Plebeian Tribunal Academy <tribuneplebeian@gmail.com>"]
 license = "MIT"
 
 [tool.poetry.dependencies]
-python = ">=3.12.8,<3.13"
+python = "3.12.8"
 fastapi = "0.104.1"
 uvicorn = {extras = ["standard"], version = "0.24.0"}
 pydantic = "2.11.9"

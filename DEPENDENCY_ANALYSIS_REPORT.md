@@ -46,8 +46,8 @@ Plebeian_Legal_Recourse_South_Africa/
 - **Impact:** MODERATE - Database session compatibility
 
 ### 4. **MAJOR CONFLICT: Python Version Requirements**
-- **Backend:** python = ">=3.12.8,<3.13" ✅
-- **Copilot Service:** python = ">=3.11,<3.13" ❌
+- **Backend:** python = "3.12.8" ✅
+- **Copilot Service:** python = "3.12.8" ✅
 - **Current System:** Python 3.12.8 ✅
 - **Impact:** LOW - System compatible but inconsistent specs
 
@@ -58,7 +58,7 @@ Plebeian_Legal_Recourse_South_Africa/
 ### Backend (main application)
 **File:** `backend/pyproject.toml`
 **Package Manager:** Poetry
-**Python Version:** >=3.12.8,<3.13
+**Python Version:** 3.12.8
 
 #### Production Dependencies:
 | Package | Specified | Installed | Status |
@@ -85,7 +85,7 @@ Plebeian_Legal_Recourse_South_Africa/
 ### Copilot Service (microservice)
 **File:** `services/copilot-client/pyproject.toml`
 **Package Manager:** Poetry (separate venv)
-**Python Version:** >=3.11,<3.13
+**Python Version:** 3.12.8
 
 #### Production Dependencies:
 | Package | Specified | Installed | Status |
