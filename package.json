@@ -1,0 +1,29 @@
+{
+  "name": "constitutional-liberation-platform",
+  "version": "1.0.0",
+  "description": "Revolutionary AI-Powered Constitutional Justice Platform",
+  "main": "index.js",
+  "scripts": {
+    "dev": "concurrently \"npm run backend:dev\" \"npm run frontend:dev\"",
+    "backend:dev": "cd backend && poetry run fastapi dev app/main.py",
+    "frontend:dev": "cd frontend && npm run dev",
+    "build": "cd frontend && npm run build",
+    "test": "cd backend && poetry run pytest && cd /home/ubuntu/repos/Plebeian_Legal_Recourse_South_Africa/frontend && npm test",
+    "deploy": "npm run build && npm run deploy:backend && npm run deploy:frontend",
+    "deploy:backend": "cd backend && poetry export -f requirements.txt --output requirements.txt",
+    "deploy:frontend": "cd frontend && npm run build"
+  },
+  "keywords": [
+    "constitutional-law",
+    "legal-platform",
+    "property-rights",
+    "ai-legal-research",
+    "south-africa",
+    "constitutional-justice"
+  ],
+  "author": "Plebeian Tribunal Academy",
+  "license": "MIT",
+  "devDependencies": {
+    "concurrently": "8.2.2"
+  }
+}
