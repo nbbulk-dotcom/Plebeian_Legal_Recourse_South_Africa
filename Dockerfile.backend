@@ -3,16 +3,20 @@ FROM python:3.12.10-slim
 ENV PYTHONUNBUFFERED=1
 WORKDIR /app/backend
 
-RUN apt-get update && apt-get install -y build-essential gcc libpq-dev curl && rm -rf /var/lib/apt/lists/*
+RUN apt-get update \
+  && apt-get install -y build-essential gcc libpq-dev curl \
+  && rm -rf /var/lib/apt/lists/*
 
-COPY backend/requirements.txt /app/backend/requirements.txt
+COPY backend/pyproject.toml /app/backend/pyproject.toml
+COPY backend/poetry.lock /app/backend/poetry.lock
 
 RUN pip install --upgrade pip==24.1.2 setuptools==68.0.0 wheel==0.41.2
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install poetry==1.8.1
+RUN poetry config virtualenvs.create false && poetry install --no-interaction --no-ansi
 
 COPY backend /app/backend
 
 ENV PORT=8000
 EXPOSE 8000
 
-CMD ["python", "-m", "uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--proxy-headers", "--limit-concurrency", "200"]
+CMD ["/bin/bash", "-lc", "test -f /app/backend/app/main.py || (echo 'Missing /app/backend/app/main.py' >&2; exit 1) && exec uvicorn app.main:app --host 0.0.0.0 --port 8000 --proxy-headers --limit-concurrency 200"]
