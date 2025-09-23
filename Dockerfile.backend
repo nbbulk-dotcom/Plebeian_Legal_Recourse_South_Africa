@@ -15,4 +15,4 @@ COPY backend /app/backend
 ENV PORT=8000
 EXPOSE 8000
 
-CMD ["/bin/bash", "-lc", "test -f /app/backend/app/main.py || (echo 'Missing /app/backend/app/main.py' >&2; exit 1) && exec uvicorn app.main:app --host 0.0.0.0 --port 8000 --proxy-headers --limit-concurrency 200"]
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--proxy-headers", "--limit-concurrency", "200"]
