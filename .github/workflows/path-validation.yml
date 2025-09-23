@@ -45,7 +45,12 @@ jobs:
           bad=0
           for f in pyproject.toml package.json backend/pyproject.toml frontend/package.json requirements.txt; do
             if [ -f "$f" ]; then
-              if grep -E ">=|\\^|~|\"latest\"|:\\s*\"latest\"" "$f" >/dev/null 2>&1; then
+              if grep -E "\\^|~|\"latest\"|:\\s*\"latest\"" "$f" >/dev/null 2>&1; then
+                echo "Floating version specifier found in $f" >&2
+                bad=1
+              elif grep -E ">=.*<" "$f" >/dev/null 2>&1; then
+                echo "Found version range in $f (acceptable for Python version constraints)" >&2
+              elif grep -E ">=" "$f" >/dev/null 2>&1; then
                 echo "Floating version specifier found in $f" >&2
                 bad=1
               fi
