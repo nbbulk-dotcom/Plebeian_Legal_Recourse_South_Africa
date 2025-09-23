@@ -1,8 +1,12 @@
-from sqlalchemy import Column, Integer, String, DateTime, Boolean, Text, ForeignKey, Enum
-from sqlalchemy.sql import func
-from sqlalchemy.orm import relationship
-from app.database import Base
 import enum
+
+from sqlalchemy import (Boolean, Column, DateTime, Enum, ForeignKey, Integer,
+                        String, Text)
+from sqlalchemy.orm import relationship
+from sqlalchemy.sql import func
+
+from app.database import Base
+
 
 class ReviewStatus(enum.Enum):
     PENDING = "pending"
@@ -10,9 +14,10 @@ class ReviewStatus(enum.Enum):
     REJECTED = "rejected"
     REQUIRES_REVISION = "requires_revision"
 
+
 class LegalReviewer(Base):
     __tablename__ = "legal_reviewers"
-    
+
     id = Column(Integer, primary_key=True, index=True)
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
     law_society_number = Column(String(50), unique=True, nullable=False)
@@ -23,13 +28,14 @@ class LegalReviewer(Base):
     approved_by = Column(Integer, ForeignKey("users.id"), nullable=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
-    
+
     user = relationship("User", foreign_keys=[user_id])
     approver = relationship("User", foreign_keys=[approved_by])
 
+
 class DocumentTemplate(Base):
     __tablename__ = "document_templates"
-    
+
     id = Column(Integer, primary_key=True, index=True)
     template_name = Column(String(255), unique=True, nullable=False)
     template_type = Column(String(100), nullable=False)
@@ -41,13 +47,14 @@ class DocumentTemplate(Base):
     created_by = Column(Integer, ForeignKey("users.id"), nullable=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
-    
+
     creator = relationship("User")
     approvals = relationship("TemplateApproval", back_populates="template")
 
+
 class TemplateApproval(Base):
     __tablename__ = "template_approvals"
-    
+
     id = Column(Integer, primary_key=True, index=True)
     template_id = Column(Integer, ForeignKey("document_templates.id"), nullable=False)
     reviewer_id = Column(Integer, ForeignKey("legal_reviewers.id"), nullable=False)
@@ -59,6 +66,6 @@ class TemplateApproval(Base):
     procedural_compliance = Column(Boolean, nullable=True)
     reviewed_at = Column(DateTime(timezone=True), nullable=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
-    
+
     template = relationship("DocumentTemplate", back_populates="approvals")
     reviewer = relationship("LegalReviewer")

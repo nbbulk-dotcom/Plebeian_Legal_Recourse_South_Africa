@@ -4,10 +4,10 @@ from typing import Any, Optional
 
 class CopilotQuery(BaseModel):
     request_id: str = Field(..., min_length=8)
-    user_id: Optional[str]
-    doc_id: Optional[str]
+    user_id: Optional[str] = None
+    doc_id: Optional[str] = None
     prompt: str = Field(..., min_length=5)
-    context: Optional[Any]
+    context: Optional[Any] = None
 
 
 class CopilotResponse(BaseModel):

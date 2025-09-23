@@ -1,11 +1,14 @@
-from sqlalchemy import Column, Integer, String, DateTime, Boolean, Text, Float, ForeignKey
-from sqlalchemy.sql import func
+from sqlalchemy import (Boolean, Column, DateTime, Float, ForeignKey, Integer,
+                        String, Text)
 from sqlalchemy.orm import relationship
+from sqlalchemy.sql import func
+
 from app.database import Base
+
 
 class LawyerAccountability(Base):
     __tablename__ = "lawyer_accountability"
-    
+
     id = Column(Integer, primary_key=True, index=True)
     lawyer_name = Column(String(255), nullable=False)
     law_firm = Column(String(255), nullable=True)
@@ -26,13 +29,14 @@ class LawyerAccountability(Base):
     notes = Column(Text, nullable=True)
     last_updated = Column(DateTime(timezone=True), server_default=func.now())
     created_at = Column(DateTime(timezone=True), server_default=func.now())
-    
+
     def __repr__(self):
         return f"<LawyerAccountability(id={self.id}, lawyer='{self.lawyer_name}', score={self.corruption_score})>"
 
+
 class LawyerCase(Base):
     __tablename__ = "lawyer_cases"
-    
+
     id = Column(Integer, primary_key=True, index=True)
     lawyer_id = Column(Integer, ForeignKey("lawyer_accountability.id"), nullable=False)
     case_number = Column(String(100), nullable=False)
@@ -46,5 +50,5 @@ class LawyerCase(Base):
     client_rating = Column(Float, nullable=True)
     case_notes = Column(Text, nullable=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
-    
+
     lawyer = relationship("LawyerAccountability")

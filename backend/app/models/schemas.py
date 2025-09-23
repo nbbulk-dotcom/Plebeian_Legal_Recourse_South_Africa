@@ -1,7 +1,9 @@
-from pydantic import BaseModel, Field
-from typing import Dict, List, Any, Optional
 from datetime import datetime
 from enum import Enum
+from typing import Any, Dict, List, Optional
+
+from pydantic import BaseModel, Field
+
 
 class DocumentType(str, Enum):
     PROMISSORY_NOTE = "promissory_note"
@@ -31,6 +33,7 @@ class DocumentType(str, Enum):
     REGULATION_CHALLENGE = "regulation_challenge"
     DIRECTIVE_CHALLENGE = "directive_challenge"
 
+
 class UserDetails(BaseModel):
     full_name: str
     id_number: str
@@ -38,6 +41,7 @@ class UserDetails(BaseModel):
     phone: str
     email: str
     occupation: Optional[str] = None
+
 
 class CaseDetails(BaseModel):
     case_type: str
@@ -49,11 +53,13 @@ class CaseDetails(BaseModel):
     violation_details: Optional[str] = None
     evidence_files: Optional[List[str]] = None
 
+
 class DocumentRequest(BaseModel):
     document_type: DocumentType
     user_details: UserDetails
     case_details: CaseDetails
     ai_enhancement: bool = True
+
 
 class DocumentResponse(BaseModel):
     document_id: str
@@ -64,20 +70,24 @@ class DocumentResponse(BaseModel):
     legal_analysis: Dict[str, Any]
     generated_at: datetime
 
+
 class ConstitutionalAnalysisRequest(BaseModel):
     law_text: str
     case_context: Optional[Dict[str, Any]] = None
     focus_areas: List[str] = ["property_rights", "administrative_justice"]
+
 
 class LawyerAccountabilityRequest(BaseModel):
     lawyer_id: str
     case_history: List[Dict[str, Any]]
     fee_analysis: Dict[str, Any]
 
+
 class CourtFilingRequest(BaseModel):
     case_data: CaseDetails
     documents: List[str]
     court_preference: Optional[str] = None
+
 
 class CaseData(BaseModel):
     case_id: str
@@ -89,6 +99,7 @@ class CaseData(BaseModel):
     filing_date: datetime
     next_hearing: Optional[datetime] = None
 
+
 class ConstitutionalViolation(BaseModel):
     violation_id: str
     section: str
@@ -97,6 +108,7 @@ class ConstitutionalViolation(BaseModel):
     severity_score: int = Field(ge=1, le=10)
     remedies: List[str]
     precedents: List[str]
+
 
 class LawyerPerformance(BaseModel):
     lawyer_id: str
@@ -109,6 +121,7 @@ class LawyerPerformance(BaseModel):
     corruption_score: float = Field(ge=0, le=10)
     risk_level: str
     client_complaints: int
+
 
 class CourtOutcome(BaseModel):
     case_id: str

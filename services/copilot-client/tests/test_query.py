@@ -1,16 +1,14 @@
 import pytest
-from httpx import AsyncClient
+from fastapi.testclient import TestClient
 from app.main import app
 
-@pytest.mark.asyncio
-async def test_health():
-    async with AsyncClient(app=app, base_url="http://test") as ac:
-        r = await ac.get("/health")
-        assert r.status_code == 200
+client = TestClient(app)
 
-@pytest.mark.asyncio
-async def test_query_when_disabled():
-    async with AsyncClient(app=app, base_url="http://test") as ac:
-        payload = {"request_id": "req-12345", "prompt": "Test prompt", "user_id": "u1"}
-        r = await ac.post("/query", json=payload)
-        assert r.status_code == 503
+def test_health():
+    r = client.get("/health")
+    assert r.status_code == 200
+
+def test_query_when_disabled():
+    payload = {"request_id": "req-12345", "prompt": "Test prompt", "user_id": "u1"}
+    r = client.post("/query", json=payload)
+    assert r.status_code == 503

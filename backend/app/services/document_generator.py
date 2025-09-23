@@ -1,12 +1,14 @@
 import asyncio
 import json
 import os
-from datetime import datetime
-from typing import Dict, List, Any, Optional
-from jinja2 import Environment, FileSystemLoader
 import uuid
+from datetime import datetime
+from typing import Any, Dict, List, Optional
+
+from jinja2 import Environment, FileSystemLoader
 
 from app.services.copilot_integration import CopilotIntegrationService
+
 
 class DocumentGeneratorService:
     def __init__(self):
@@ -14,12 +16,11 @@ class DocumentGeneratorService:
         self.template_dir = "app/templates/documents"
         self.output_dir = "generated_documents"
         os.makedirs(self.output_dir, exist_ok=True)
-        
+
         self.jinja_env = Environment(
-            loader=FileSystemLoader(self.template_dir),
-            autoescape=True
+            loader=FileSystemLoader(self.template_dir), autoescape=True
         )
-        
+
         self.document_types = {
             "promissory_note": "Promissory Note Template",
             "bill_of_exchange": "Bill of Exchange Template",
@@ -46,27 +47,26 @@ class DocumentGeneratorService:
             "mandate_challenge": "Mandate Challenge",
             "bylaw_challenge": "Bylaw Challenge",
             "regulation_challenge": "Regulation Challenge",
-            "directive_challenge": "Directive Challenge"
+            "directive_challenge": "Directive Challenge",
         }
 
     async def generate_document(
-        self, 
-        document_type: str, 
-        user_details: Dict[str, Any], 
+        self,
+        document_type: str,
+        user_details: Dict[str, Any],
         case_details: Dict[str, Any],
         ai_enhancement: bool = True,
-        user_id: int = None
+        user_id: int = None,
     ) -> Dict[str, Any]:
-        
         document_id = str(uuid.uuid4())
-        
+
         base_content = await self._generate_base_document(
             document_type, user_details, case_details
         )
-        
+
         ai_enhancements = []
         legal_analysis = {}
-        
+
         if ai_enhancement:
             enhanced_content = await self.copilot.enhance_document(
                 base_content, document_type, case_details
@@ -74,11 +74,9 @@ class DocumentGeneratorService:
             base_content = enhanced_content.get("content", base_content)
             ai_enhancements = enhanced_content.get("enhancements", [])
             legal_analysis = enhanced_content.get("legal_analysis", {})
-        
-        file_path = await self._save_document(
-            document_id, document_type, base_content
-        )
-        
+
+        file_path = await self._save_document(document_id, document_type, base_content)
+
         return {
             "document_id": document_id,
             "document_type": document_type,
@@ -87,34 +85,42 @@ class DocumentGeneratorService:
             "ai_enhancements": ai_enhancements,
             "legal_analysis": legal_analysis,
             "generated_at": datetime.now(),
-            "user_id": user_id
+            "user_id": user_id,
         }
 
     async def _generate_base_document(
-        self, 
-        document_type: str, 
-        user_details: Dict[str, Any], 
-        case_details: Dict[str, Any]
+        self,
+        document_type: str,
+        user_details: Dict[str, Any],
+        case_details: Dict[str, Any],
     ) -> str:
-        
         if document_type in ["promissory_note", "bill_of_exchange", "fraud_notice"]:
-            return await self._generate_plebeian_document(document_type, user_details, case_details)
+            return await self._generate_plebeian_document(
+                document_type, user_details, case_details
+            )
         elif document_type.startswith("criminal_charges"):
-            return await self._generate_criminal_charges(document_type, user_details, case_details)
+            return await self._generate_criminal_charges(
+                document_type, user_details, case_details
+            )
         elif document_type.endswith("_challenge"):
-            return await self._generate_constitutional_challenge(document_type, user_details, case_details)
+            return await self._generate_constitutional_challenge(
+                document_type, user_details, case_details
+            )
         elif "eviction" in document_type:
-            return await self._generate_eviction_application(document_type, user_details, case_details)
+            return await self._generate_eviction_application(
+                document_type, user_details, case_details
+            )
         else:
-            return await self._generate_generic_document(document_type, user_details, case_details)
+            return await self._generate_generic_document(
+                document_type, user_details, case_details
+            )
 
     async def _generate_plebeian_document(
-        self, 
-        document_type: str, 
-        user_details: Dict[str, Any], 
-        case_details: Dict[str, Any]
+        self,
+        document_type: str,
+        user_details: Dict[str, Any],
+        case_details: Dict[str, Any],
     ) -> str:
-        
         templates = {
             "promissory_note": """
 PROMISSORY NOTE
@@ -194,21 +200,25 @@ Date: {date}
 
 _________________________
 Signature
-"""
+""",
         }
-        
+
         template = templates.get(document_type, "")
-        
+
         arrears_amount = case_details.get("arrears_amount") or 0
         context = {
             "date": datetime.now().strftime("%Y-%m-%d"),
             "creditor_name": user_details.get("full_name", ""),
             "creditor_id": user_details.get("id_number", ""),
             "creditor_address": user_details.get("address", ""),
-            "debtor_name": case_details.get("parties_involved", [""])[0] if case_details.get("parties_involved") else "",
+            "debtor_name": case_details.get("parties_involved", [""])[0]
+            if case_details.get("parties_involved")
+            else "",
             "debtor_id": "Unknown",
             "debtor_address": "As per records",
-            "drawee_name": case_details.get("parties_involved", [""])[0] if case_details.get("parties_involved") else "",
+            "drawee_name": case_details.get("parties_involved", [""])[0]
+            if case_details.get("parties_involved")
+            else "",
             "drawee_address": "As per records",
             "payee_name": user_details.get("full_name", ""),
             "drawer_name": user_details.get("full_name", ""),
@@ -222,19 +232,20 @@ Signature
             "fraud_particulars": case_details.get("violation_details", ""),
             "remedy_demands": "Full restitution and cessation of fraudulent conduct",
             "issuer_name": user_details.get("full_name", ""),
-            "recipient_name": case_details.get("parties_involved", [""])[0] if case_details.get("parties_involved") else "",
-            "recipient_address": "As per records"
+            "recipient_name": case_details.get("parties_involved", [""])[0]
+            if case_details.get("parties_involved")
+            else "",
+            "recipient_address": "As per records",
         }
-        
+
         return template.format(**context)
 
     async def _generate_criminal_charges(
-        self, 
-        document_type: str, 
-        user_details: Dict[str, Any], 
-        case_details: Dict[str, Any]
+        self,
+        document_type: str,
+        user_details: Dict[str, Any],
+        case_details: Dict[str, Any],
     ) -> str:
-        
         if document_type == "criminal_charges_police":
             return f"""
 CRIMINAL CHARGES FOR POLICE SUBMISSION
@@ -294,7 +305,7 @@ Date: {datetime.now().strftime('%Y-%m-%d')}
 _________________________
 Complainant Signature
 """
-        
+
         elif document_type == "criminal_charges_prosecutor":
             return f"""
 CRIMINAL CHARGES FOR PROSECUTOR SUBMISSION
@@ -342,7 +353,7 @@ Date: {datetime.now().strftime('%Y-%m-%d')}
 _________________________
 Complainant
 """
-        
+
         else:  # criminal_charges_court
             return f"""
 CRIMINAL CHARGES FOR COURT SUBMISSION
@@ -389,14 +400,15 @@ Prosecutor
 """
 
     async def _generate_constitutional_challenge(
-        self, 
-        document_type: str, 
-        user_details: Dict[str, Any], 
-        case_details: Dict[str, Any]
+        self,
+        document_type: str,
+        user_details: Dict[str, Any],
+        case_details: Dict[str, Any],
     ) -> str:
-        
-        challenge_type = document_type.replace("_challenge", "").replace("_", " ").title()
-        
+        challenge_type = (
+            document_type.replace("_challenge", "").replace("_", " ").title()
+        )
+
         return f"""
 CONSTITUTIONAL CHALLENGE: {challenge_type.upper()}
 
@@ -468,14 +480,13 @@ Applicant / Attorney
 """
 
     async def _generate_eviction_application(
-        self, 
-        document_type: str, 
-        user_details: Dict[str, Any], 
-        case_details: Dict[str, Any]
+        self,
+        document_type: str,
+        user_details: Dict[str, Any],
+        case_details: Dict[str, Any],
     ) -> str:
-        
         urgency = "URGENT" if "urgent" in document_type else "STANDARD"
-        
+
         return f"""
 {urgency} EVICTION APPLICATION
 
@@ -542,12 +553,11 @@ Applicant / Attorney
 """
 
     async def _generate_generic_document(
-        self, 
-        document_type: str, 
-        user_details: Dict[str, Any], 
-        case_details: Dict[str, Any]
+        self,
+        document_type: str,
+        user_details: Dict[str, Any],
+        case_details: Dict[str, Any],
     ) -> str:
-        
         return f"""
 {self.document_types.get(document_type, document_type).upper()}
 
@@ -587,11 +597,44 @@ Signature
     def _number_to_words(self, number: float) -> str:
         if number is None or number == 0:
             return "Zero Rand"
-        
-        ones = ["", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine"]
-        teens = ["Ten", "Eleven", "Twelve", "Thirteen", "Fourteen", "Fifteen", "Sixteen", "Seventeen", "Eighteen", "Nineteen"]
-        tens = ["", "", "Twenty", "Thirty", "Forty", "Fifty", "Sixty", "Seventy", "Eighty", "Ninety"]
-        
+
+        ones = [
+            "",
+            "One",
+            "Two",
+            "Three",
+            "Four",
+            "Five",
+            "Six",
+            "Seven",
+            "Eight",
+            "Nine",
+        ]
+        teens = [
+            "Ten",
+            "Eleven",
+            "Twelve",
+            "Thirteen",
+            "Fourteen",
+            "Fifteen",
+            "Sixteen",
+            "Seventeen",
+            "Eighteen",
+            "Nineteen",
+        ]
+        tens = [
+            "",
+            "",
+            "Twenty",
+            "Thirty",
+            "Forty",
+            "Fifty",
+            "Sixty",
+            "Seventy",
+            "Eighty",
+            "Ninety",
+        ]
+
         def convert_hundreds(n):
             result = ""
             if n >= 100:
@@ -606,7 +649,7 @@ Signature
             if n > 0:
                 result += ones[n] + " "
             return result
-        
+
         if number < 1000:
             return convert_hundreds(int(number)) + "Rand"
         elif number < 1000000:
@@ -619,11 +662,13 @@ Signature
         else:
             return f"{number:,.0f} Rand"
 
-    async def _save_document(self, document_id: str, document_type: str, content: str) -> str:
+    async def _save_document(
+        self, document_id: str, document_type: str, content: str
+    ) -> str:
         filename = f"{document_id}_{document_type}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.txt"
         file_path = os.path.join(self.output_dir, filename)
-        
-        with open(file_path, 'w', encoding='utf-8') as f:
+
+        with open(file_path, "w", encoding="utf-8") as f:
             f.write(content)
-        
+
         return file_path

@@ -1,8 +1,9 @@
 import asyncio
 import json
-from typing import Dict, List, Any, Optional
-from datetime import datetime
 import random
+from datetime import datetime
+from typing import Any, Dict, List, Optional
+
 
 class CopilotIntegrationService:
     def __init__(self):
@@ -11,75 +12,89 @@ class CopilotIntegrationService:
             "Constitutional Court Database",
             "Justice Department Archives",
             "Law Society Records",
-            "Parliamentary Records"
+            "Parliamentary Records",
         ]
 
     async def enhance_document(
-        self, 
-        base_content: str, 
-        document_type: str, 
-        case_details: Dict[str, Any]
+        self, base_content: str, document_type: str, case_details: Dict[str, Any]
     ) -> Dict[str, Any]:
-        
         await asyncio.sleep(0.1)
-        
+
         enhancements = []
         legal_analysis = {}
-        
+
         if "constitutional" in document_type:
-            enhancements.extend([
-                "Added constitutional precedent citations",
-                "Enhanced legal arguments with Bill of Rights references",
-                "Included relevant Constitutional Court judgments",
-                "Strengthened constitutional compliance analysis"
-            ])
-            
+            enhancements.extend(
+                [
+                    "Added constitutional precedent citations",
+                    "Enhanced legal arguments with Bill of Rights references",
+                    "Included relevant Constitutional Court judgments",
+                    "Strengthened constitutional compliance analysis",
+                ]
+            )
+
             legal_analysis = {
-                "constitutional_basis": ["Section 25 (Property Rights)", "Section 33 (Administrative Justice)"],
-                "precedents_cited": ["First National Bank v Commissioner for SARS", "Mkontwana v Nelson Mandela Metropolitan Municipality"],
+                "constitutional_basis": [
+                    "Section 25 (Property Rights)",
+                    "Section 33 (Administrative Justice)",
+                ],
+                "precedents_cited": [
+                    "First National Bank v Commissioner for SARS",
+                    "Mkontwana v Nelson Mandela Metropolitan Municipality",
+                ],
                 "success_probability": "85-95%",
-                "recommended_court": "Constitutional Court"
+                "recommended_court": "Constitutional Court",
             }
-        
+
         elif "criminal" in document_type:
-            enhancements.extend([
-                "Enhanced criminal law citations",
-                "Added PRECCA Act references for corruption charges",
-                "Strengthened evidence requirements",
-                "Included penalty provisions"
-            ])
-            
+            enhancements.extend(
+                [
+                    "Enhanced criminal law citations",
+                    "Added PRECCA Act references for corruption charges",
+                    "Strengthened evidence requirements",
+                    "Included penalty provisions",
+                ]
+            )
+
             legal_analysis = {
                 "criminal_charges": ["Corruption", "Theft", "Extortion", "Fraud"],
                 "maximum_penalties": "18 years imprisonment",
                 "prosecution_probability": "High",
-                "evidence_strength": "Strong"
+                "evidence_strength": "Strong",
             }
-        
+
         elif "eviction" in document_type:
-            enhancements.extend([
-                "Added PIE Act compliance requirements",
-                "Enhanced property rights arguments",
-                "Included rental arrears calculations",
-                "Strengthened urgency motivations"
-            ])
-            
+            enhancements.extend(
+                [
+                    "Added PIE Act compliance requirements",
+                    "Enhanced property rights arguments",
+                    "Included rental arrears calculations",
+                    "Strengthened urgency motivations",
+                ]
+            )
+
             legal_analysis = {
                 "legal_basis": "PIE Act and common law",
                 "constitutional_rights": "Section 25 property rights",
                 "success_probability": "90-95%",
-                "estimated_timeline": "2-4 months"
+                "estimated_timeline": "2-4 months",
             }
-        
-        enhanced_content = base_content + "\n\n" + self._generate_ai_enhancement_text(document_type, case_details)
-        
+
+        enhanced_content = (
+            base_content
+            + "\n\n"
+            + self._generate_ai_enhancement_text(document_type, case_details)
+        )
+
         return {
             "content": enhanced_content,
             "enhancements": enhancements,
-            "legal_analysis": legal_analysis
+            "legal_analysis": legal_analysis,
         }
 
-    def _generate_ai_enhancement_text(self, document_type: str, case_details: Dict[str, Any]) -> str:
+    def _generate_ai_enhancement_text(
+        self, document_type: str, case_details: Dict[str, Any]
+    ) -> str:
         if "constitutional" in document_type:
             return """
 AI-ENHANCED CONSTITUTIONAL ANALYSIS:
@@ -103,7 +118,7 @@ STRATEGIC RECOMMENDATIONS:
 
 SUCCESS PROBABILITY: 85-95% based on constitutional precedent analysis.
 """
-        
+
         elif "criminal" in document_type:
             return """
 AI-ENHANCED CRIMINAL LAW ANALYSIS:
@@ -128,8 +143,10 @@ CONSTITUTIONAL IMPLICATIONS:
 This case involves violations of Section 195 public administration principles and Section 25 property rights.
 
 PROSECUTION PROBABILITY: HIGH - Strong evidence base and clear legal framework.
-""".format(amount=case_details.get('arrears_amount', 0))
-        
+""".format(
+                amount=case_details.get("arrears_amount", 0)
+            )
+
         else:
             return """
 AI-ENHANCED LEGAL ANALYSIS:
@@ -153,117 +170,135 @@ AI CONFIDENCE LEVEL: HIGH - Legal basis well-established.
 """
 
     async def analyze_constitutional_compliance(
-        self, 
-        law_text: str, 
-        case_context: Optional[Dict[str, Any]], 
-        focus_areas: List[str]
+        self,
+        law_text: str,
+        case_context: Optional[Dict[str, Any]],
+        focus_areas: List[str],
     ) -> Dict[str, Any]:
-        
         await asyncio.sleep(0.2)
-        
+
         analysis = {
             "compliance_assessment": "VIOLATIONS DETECTED",
             "violation_severity": "HIGH",
             "constitutional_sections_affected": [],
             "recommended_challenges": [],
             "precedent_support": [],
-            "success_probability": "85-95%"
+            "success_probability": "85-95%",
         }
-        
+
         if "property_rights" in focus_areas:
-            analysis["constitutional_sections_affected"].append("Section 25 (Property Rights)")
-            analysis["recommended_challenges"].append("Constitutional challenge to arbitrary property deprivation")
-            analysis["precedent_support"].append("First National Bank v Commissioner for SARS - arbitrary deprivation test")
-        
+            analysis["constitutional_sections_affected"].append(
+                "Section 25 (Property Rights)"
+            )
+            analysis["recommended_challenges"].append(
+                "Constitutional challenge to arbitrary property deprivation"
+            )
+            analysis["precedent_support"].append(
+                "First National Bank v Commissioner for SARS - arbitrary deprivation test"
+            )
+
         if "administrative_justice" in focus_areas:
-            analysis["constitutional_sections_affected"].append("Section 33 (Just Administrative Action)")
-            analysis["recommended_challenges"].append("PAJA review for procedural unfairness")
-            analysis["precedent_support"].append("Pharmaceutical Manufacturers v President - procedural fairness requirements")
-        
+            analysis["constitutional_sections_affected"].append(
+                "Section 33 (Just Administrative Action)"
+            )
+            analysis["recommended_challenges"].append(
+                "PAJA review for procedural unfairness"
+            )
+            analysis["precedent_support"].append(
+                "Pharmaceutical Manufacturers v President - procedural fairness requirements"
+            )
+
         analysis["ai_recommendations"] = [
             "File urgent constitutional challenge",
             "Apply for interim relief",
             "Seek constitutional damages",
-            "Consider class action if multiple parties affected"
+            "Consider class action if multiple parties affected",
         ]
-        
+
         return analysis
 
     async def analyze_lawyer_corruption(
-        self, 
-        lawyer_data: Dict[str, Any], 
-        case_history: List[Dict[str, Any]]
+        self, lawyer_data: Dict[str, Any], case_history: List[Dict[str, Any]]
     ) -> Dict[str, Any]:
-        
         await asyncio.sleep(0.1)
-        
+
         corruption_indicators = lawyer_data.get("corruption_indicators", [])
-        
+
         analysis = {
-            "corruption_risk": "HIGH" if len(corruption_indicators) > 2 else "MEDIUM" if len(corruption_indicators) > 0 else "LOW",
+            "corruption_risk": "HIGH"
+            if len(corruption_indicators) > 2
+            else "MEDIUM"
+            if len(corruption_indicators) > 0
+            else "LOW",
             "mafia_tactics_detected": [],
             "client_protection_recommendations": [],
-            "investigation_priority": "URGENT" if len(corruption_indicators) > 2 else "STANDARD"
+            "investigation_priority": "URGENT"
+            if len(corruption_indicators) > 2
+            else "STANDARD",
         }
-        
+
         if "excessive_fees" in corruption_indicators:
-            analysis["mafia_tactics_detected"].append({
-                "tactic": "Fee Escalation Racket",
-                "description": "Systematic escalation of fees to maximize extraction from clients",
-                "evidence_strength": "Strong"
-            })
-        
+            analysis["mafia_tactics_detected"].append(
+                {
+                    "tactic": "Fee Escalation Racket",
+                    "description": "Systematic escalation of fees to maximize extraction from clients",
+                    "evidence_strength": "Strong",
+                }
+            )
+
         if "case_prolongation" in corruption_indicators:
-            analysis["mafia_tactics_detected"].append({
-                "tactic": "Case Prolongation Strategy",
-                "description": "Deliberately extending cases to increase billing opportunities",
-                "evidence_strength": "Strong"
-            })
-        
+            analysis["mafia_tactics_detected"].append(
+                {
+                    "tactic": "Case Prolongation Strategy",
+                    "description": "Deliberately extending cases to increase billing opportunities",
+                    "evidence_strength": "Strong",
+                }
+            )
+
         if "client_impoverishment" in corruption_indicators:
-            analysis["mafia_tactics_detected"].append({
-                "tactic": "Client Impoverishment Scheme",
-                "description": "Systematically draining client resources regardless of case merit",
-                "evidence_strength": "Critical"
-            })
-        
+            analysis["mafia_tactics_detected"].append(
+                {
+                    "tactic": "Client Impoverishment Scheme",
+                    "description": "Systematically draining client resources regardless of case merit",
+                    "evidence_strength": "Critical",
+                }
+            )
+
         analysis["client_protection_recommendations"] = [
             "Immediate termination of representation recommended",
             "Secure all case files and documentation",
             "Report to Legal Practice Council",
             "Consider criminal complaint if fraud suspected",
-            "Seek alternative legal representation urgently"
+            "Seek alternative legal representation urgently",
         ]
-        
+
         return analysis
 
     async def analyze_case_prospects(
-        self, 
-        case_data: Dict[str, Any], 
-        court: str, 
-        documents: List[str]
+        self, case_data: Dict[str, Any], court: str, documents: List[str]
     ) -> Dict[str, Any]:
-        
         await asyncio.sleep(0.1)
-        
+
         case_type = case_data.get("case_type", "").lower()
-        
+
         base_success_rate = 0.75
-        
+
         if "constitutional" in case_type:
             base_success_rate = 0.85
         elif "property" in case_type:
             base_success_rate = 0.90
         elif "corruption" in case_type:
             base_success_rate = 0.88
-        
+
         if court == "constitutional":
             base_success_rate += 0.05
         elif court == "high":
             base_success_rate += 0.03
-        
-        success_percentage = f"{base_success_rate*100:.0f}-{min(95, base_success_rate*100+10):.0f}%"
-        
+
+        success_percentage = (
+            f"{base_success_rate*100:.0f}-{min(95, base_success_rate*100+10):.0f}%"
+        )
+
         analysis = {
             "success_probability": success_percentage,
             "strength_assessment": "STRONG" if base_success_rate > 0.8 else "MODERATE",
@@ -271,37 +306,37 @@ AI CONFIDENCE LEVEL: HIGH - Legal basis well-established.
                 "Strong constitutional basis",
                 "Clear legal precedents",
                 "Comprehensive evidence",
-                "Appropriate court selection"
+                "Appropriate court selection",
             ],
             "potential_challenges": [
                 "Respondent may raise technical defenses",
                 "Court may require additional evidence",
-                "Timeline may be extended due to complexity"
+                "Timeline may be extended due to complexity",
             ],
             "strategic_recommendations": [
                 "Prepare comprehensive founding affidavit",
                 "Compile all supporting evidence",
                 "Consider interim relief application",
-                "Engage expert witnesses if required"
+                "Engage expert witnesses if required",
             ],
             "estimated_timeline": self._get_estimated_timeline(court, case_type),
-            "cost_estimate": self._get_cost_estimate(court, case_type)
+            "cost_estimate": self._get_cost_estimate(court, case_type),
         }
-        
+
         return analysis
 
     def _get_estimated_timeline(self, court: str, case_type: str) -> str:
         timelines = {
             "magistrate": "2-4 months",
-            "high": "6-12 months", 
-            "constitutional": "12-24 months"
+            "high": "6-12 months",
+            "constitutional": "12-24 months",
         }
-        
+
         base_timeline = timelines.get(court, "6-12 months")
-        
+
         if "urgent" in case_type:
             return f"URGENT: {base_timeline.split('-')[0]} months (expedited)"
-        
+
         return base_timeline
 
     def _get_cost_estimate(self, court: str, case_type: str) -> str:
@@ -313,13 +348,10 @@ AI CONFIDENCE LEVEL: HIGH - Legal basis well-established.
             return "R10,000 - R35,000"
 
     async def research_legal_precedents(
-        self, 
-        query: str, 
-        case_context: Dict[str, Any]
+        self, query: str, case_context: Dict[str, Any]
     ) -> List[Dict[str, Any]]:
-        
         await asyncio.sleep(0.2)
-        
+
         precedents = [
             {
                 "case_name": "First National Bank of SA Ltd t/a Wesbank v Commissioner for SARS",
@@ -329,17 +361,17 @@ AI CONFIDENCE LEVEL: HIGH - Legal basis well-established.
                 "relevance_score": 9.5,
                 "key_principle": "Test for arbitrary deprivation of property under Section 25",
                 "summary": "Established the test for determining when deprivation of property is arbitrary and therefore unconstitutional.",
-                "application": "Directly applicable to property rights violations and constitutional challenges."
+                "application": "Directly applicable to property rights violations and constitutional challenges.",
             },
             {
                 "case_name": "Mkontwana v Nelson Mandela Metropolitan Municipality",
                 "citation": "2005 (1) SA 530 (CC)",
-                "court": "Constitutional Court", 
+                "court": "Constitutional Court",
                 "year": 2005,
                 "relevance_score": 9.0,
                 "key_principle": "Municipal property rights and constitutional compliance",
                 "summary": "Addressed property rights in the context of municipal law and constitutional requirements.",
-                "application": "Relevant for property disputes involving municipal authorities."
+                "application": "Relevant for property disputes involving municipal authorities.",
             },
             {
                 "case_name": "Port Elizabeth Municipality v Various Occupiers",
@@ -349,20 +381,17 @@ AI CONFIDENCE LEVEL: HIGH - Legal basis well-established.
                 "relevance_score": 8.5,
                 "key_principle": "PIE Act constitutional compliance and eviction procedures",
                 "summary": "Established constitutional requirements for eviction procedures under PIE Act.",
-                "application": "Essential for eviction applications and unlawful occupation cases."
-            }
+                "application": "Essential for eviction applications and unlawful occupation cases.",
+            },
         ]
-        
+
         return precedents
 
     async def generate_legal_strategy(
-        self, 
-        case_data: Dict[str, Any], 
-        violations: List[Dict[str, Any]]
+        self, case_data: Dict[str, Any], violations: List[Dict[str, Any]]
     ) -> Dict[str, Any]:
-        
         await asyncio.sleep(0.1)
-        
+
         strategy = {
             "primary_approach": "Constitutional Challenge with Civil Remedies",
             "phase_1": {
@@ -370,40 +399,40 @@ AI CONFIDENCE LEVEL: HIGH - Legal basis well-established.
                 "actions": [
                     "File urgent interim relief application",
                     "Apply for asset preservation order",
-                    "Seek immediate cessation of violations"
+                    "Seek immediate cessation of violations",
                 ],
-                "timeline": "1-2 weeks"
+                "timeline": "1-2 weeks",
             },
             "phase_2": {
                 "title": "Main Constitutional Challenge",
                 "actions": [
                     "File comprehensive constitutional challenge",
                     "Compile expert evidence",
-                    "Engage constitutional law experts"
+                    "Engage constitutional law experts",
                 ],
-                "timeline": "4-8 weeks"
+                "timeline": "4-8 weeks",
             },
             "phase_3": {
                 "title": "Civil Remedies",
                 "actions": [
                     "Claim constitutional damages",
                     "Seek costs order on punitive scale",
-                    "Apply for structural interdicts if systemic violations"
+                    "Apply for structural interdicts if systemic violations",
                 ],
-                "timeline": "6-12 months"
+                "timeline": "6-12 months",
             },
             "success_factors": [
                 "Strong constitutional basis",
                 "Clear precedent support",
                 "Comprehensive evidence",
-                "Expert legal representation"
+                "Expert legal representation",
             ],
             "risk_mitigation": [
                 "Prepare for technical defenses",
                 "Ensure procedural compliance",
                 "Maintain detailed case records",
-                "Consider alternative dispute resolution"
-            ]
+                "Consider alternative dispute resolution",
+            ],
         }
-        
+
         return strategy

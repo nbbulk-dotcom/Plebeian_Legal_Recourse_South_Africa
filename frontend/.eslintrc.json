@@ -1,0 +1,15 @@
+{
+  "root": true,
+  "ignorePatterns": ["*.js", ".eslintrc.json", "dist/", "build/", "node_modules/", "vite.config.ts", "*.config.ts"],
+  "parser": "@typescript-eslint/parser",
+  "parserOptions": {
+    "project": ["./tsconfig.json"],
+    "tsconfigRootDir": ".",
+    "sourceType": "module",
+    "ecmaVersion": "latest"
+  },
+  "env": { "browser": true, "node": true },
+  "plugins": ["@typescript-eslint"],
+  "extends": ["eslint:recommended", "plugin:@typescript-eslint/recommended"],
+  "rules": {}
+}

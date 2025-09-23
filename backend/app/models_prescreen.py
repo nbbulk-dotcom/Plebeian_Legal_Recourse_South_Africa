@@ -1,6 +1,8 @@
-from sqlalchemy import Column, Integer, String, Boolean, TIMESTAMP, Text, ForeignKey, JSON
-from sqlalchemy.sql import func
+from sqlalchemy import (JSON, TIMESTAMP, Boolean, Column, ForeignKey, Integer,
+                        String, Text)
 from sqlalchemy.orm import relationship
+from sqlalchemy.sql import func
+
 from app.database import Base
 
 
@@ -13,7 +15,9 @@ class PrescreenField(Base):
     field_type = Column(String(64), nullable=False)
     required = Column(Boolean, nullable=False, server_default="true")
     meta = Column(JSON, nullable=True)
-    created_at = Column(TIMESTAMP(timezone=True), server_default=func.now(), nullable=False)
+    created_at = Column(
+        TIMESTAMP(timezone=True), server_default=func.now(), nullable=False
+    )
 
 
 class PrescreenSubmission(Base):
@@ -25,8 +29,12 @@ class PrescreenSubmission(Base):
     data = Column(JSON, nullable=False)
     status = Column(String(50), nullable=False, server_default="draft")
     disclaimer = Column(Text, nullable=True)
-    created_at = Column(TIMESTAMP(timezone=True), server_default=func.now(), nullable=False)
-    updated_at = Column(TIMESTAMP(timezone=True), server_default=func.now(), nullable=False)
+    created_at = Column(
+        TIMESTAMP(timezone=True), server_default=func.now(), nullable=False
+    )
+    updated_at = Column(
+        TIMESTAMP(timezone=True), server_default=func.now(), nullable=False
+    )
 
     def to_dict(self):
         return {
