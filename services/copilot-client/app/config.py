@@ -1,4 +1,4 @@
-from pydantic import AnyUrl
+from pydantic import AnyUrl, ConfigDict
 from pydantic_settings import BaseSettings
 
 
@@ -12,9 +12,5 @@ class Settings(BaseSettings):
     AI_AUTO_APPROVE: bool = False
     REQUEST_TIMEOUT_SECONDS: int = 20
 
-    class Config:
-        env_file = ".env"
-        env_file_encoding = "utf-8"
-
-
+    model_config = ConfigDict(env_file=".env", env_file_encoding="utf-8")
 settings = Settings()
