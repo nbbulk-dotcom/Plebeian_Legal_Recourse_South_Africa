@@ -5,13 +5,13 @@ description = "Copilot client proxy for Constitutional Liberation Platform"
 authors = ["nicolas <nbbulk@gmail.com>"]
 
 [tool.poetry.dependencies]
-python = ">=3.11,<3.13"
+python = "3.12.8"
 fastapi = "0.104.1"
 httpx = "0.25.2"
 sqlalchemy = "2.0.23"
 alembic = "1.13.0"
-pydantic = "^2.7.0"
-pydantic-settings = "^2.10.1"
+pydantic = "2.11.9"
+pydantic-settings = "2.10.1"
 psycopg2-binary = "2.9.9"
 python-dotenv = "1.0.0"
 uvicorn = "0.24.0"

@@ -61,8 +61,8 @@ fastapi = "0.100.0"
 sqlalchemy = "2.0.20"
 
 # AFTER
-pydantic = "^2.7.0"
-pydantic-settings = "^2.10.1"
+pydantic = "2.11.9"
+pydantic-settings = "2.10.1"
 fastapi = "0.104.1"
 sqlalchemy = "2.0.23"
 ```

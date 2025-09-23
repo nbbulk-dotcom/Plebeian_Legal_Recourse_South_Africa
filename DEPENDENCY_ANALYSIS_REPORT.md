@@ -28,7 +28,7 @@ Plebeian_Legal_Recourse_South_Africa/
 ## 🚨 CRITICAL VERSION CONFLICTS DETECTED
 
 ### 1. **MAJOR CONFLICT: Pydantic Version Mismatch**
-- **Backend:** pydantic = "^2.7.0" (INSTALLED: 2.11.9) ✅
+- **Backend:** pydantic = "2.11.9" (INSTALLED: 2.11.9) ✅
 - **Copilot Service:** pydantic = "1.10.9" (SPECIFIED) ❌
 - **Impact:** BREAKING - Incompatible API changes between v1 and v2
 - **Files Affected:**
@@ -65,8 +65,8 @@ Plebeian_Legal_Recourse_South_Africa/
 |---------|-----------|-----------|---------|
 | fastapi | 0.104.1 | 0.104.1 | ✅ |
 | uvicorn | 0.24.0 | 0.24.0 | ✅ |
-| pydantic | ^2.7.0 | 2.11.9 | ✅ |
-| pydantic-settings | ^2.10.1 | 2.10.1 | ✅ |
+| pydantic | 2.11.9 | 2.11.9 | ✅ |
+| pydantic-settings | 2.10.1 | 2.10.1 | ✅ |
 | sqlalchemy | 2.0.23 | 2.0.23 | ✅ |
 | alembic | 1.13.0 | 1.13.0 | ✅ |
 | psycopg2-binary | 2.9.9 | 2.9.9 | ✅ |
@@ -119,10 +119,10 @@ Plebeian_Legal_Recourse_South_Africa/
 #### Development Dependencies:
 | Package | Specified | Installed | Status |
 |---------|-----------|-----------|---------|
-| typescript | ^5.2.2 | 5.2.2 | ✅ |
-| eslint | ^8.49.0 | 8.49.0 | ✅ |
-| @typescript-eslint/parser | ^6.12.0 | 6.12.0 | ✅ |
-| @typescript-eslint/eslint-plugin | ^6.12.0 | 6.12.0 | ✅ |
+| typescript | 5.2.2 | 5.2.2 | ✅ |
+| eslint | 8.49.0 | 8.49.0 | ✅ |
+| @typescript-eslint/parser | 6.12.0 | 6.12.0 | ✅ |
+| @typescript-eslint/eslint-plugin | 6.12.0 | 6.12.0 | ✅ |
 | vite | 4.4.5 | 4.4.5 | ✅ |
 
 ---
