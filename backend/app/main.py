@@ -1,14 +1,25 @@
-from fastapi import FastAPI, HTTPException, Depends
+from fastapi import FastAPI, HTTPException, Depends, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
+from fastapi.security import HTTPBearer
+from sqlalchemy.orm import Session
 import os
 from typing import Dict, List, Any, Optional
 from pydantic import BaseModel
 import asyncio
 import json
-from datetime import datetime
+from datetime import datetime, timedelta
 
+from app.database import get_db, create_tables
+from app.auth.security import (
+    get_current_user, require_role, require_roles, 
+    create_access_token, verify_password, get_password_hash
+)
+from app.models.user import User, UserRole
+from app.models.legal_governance import LegalReviewer, DocumentTemplate, TemplateApproval, ReviewStatus
+from app.models.constitutional_violations import ConstitutionalViolation
+from app.models.lawyer_accountability import LawyerAccountability
 from app.services.document_generator import DocumentGeneratorService
 from app.services.constitutional_analyzer import ConstitutionalAnalyzerService
 from app.services.lawyer_accountability import LawyerAccountabilityService
@@ -34,12 +45,33 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+@app.on_event("startup")
+async def startup_event():
+    create_tables()
+
 document_service = DocumentGeneratorService()
 constitutional_service = ConstitutionalAnalyzerService()
 lawyer_service = LawyerAccountabilityService()
 court_service = CourtFilingService()
 copilot_service = CopilotIntegrationService()
 research_service = InternetResearchService()
+
+class UserLogin(BaseModel):
+    email: str
+    password: str
+
+class UserRegister(BaseModel):
+    email: str
+    password: str
+    full_name: str
+    phone_number: Optional[str] = None
+    id_number: Optional[str] = None
+    address: Optional[str] = None
+
+class Token(BaseModel):
+    access_token: str
+    token_type: str
+    user_role: str
 
 @app.get("/")
 async def root():
@@ -60,15 +92,117 @@ async def root():
 async def health_check():
     return {"status": "healthy", "timestamp": datetime.now().isoformat()}
 
+@app.post("/api/auth/register", response_model=Token)
+async def register(user_data: UserRegister, db: Session = Depends(get_db)):
+    existing_user = db.query(User).filter(User.email == user_data.email).first()
+    if existing_user:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Email already registered"
+        )
+    
+    hashed_password = get_password_hash(user_data.password)
+    new_user = User(
+        email=user_data.email,
+        hashed_password=hashed_password,
+        full_name=user_data.full_name,
+        phone_number=user_data.phone_number,
+        id_number=user_data.id_number,
+        address=user_data.address,
+        role=UserRole.CITIZEN
+    )
+    
+    db.add(new_user)
+    db.commit()
+    db.refresh(new_user)
+    
+    access_token = create_access_token(data={"sub": new_user.email})
+    
+    return {
+        "access_token": access_token,
+        "token_type": "bearer",
+        "user_role": new_user.role.value
+    }
+
+@app.post("/api/auth/login", response_model=Token)
+async def login(user_credentials: UserLogin, db: Session = Depends(get_db)):
+    user = db.query(User).filter(User.email == user_credentials.email).first()
+    
+    if not user or not verify_password(user_credentials.password, user.hashed_password):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Incorrect email or password"
+        )
+    
+    if not user.is_active:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Account is deactivated"
+        )
+    
+    user.last_login = datetime.utcnow()
+    db.commit()
+    
+    access_token = create_access_token(data={"sub": user.email})
+    
+    return {
+        "access_token": access_token,
+        "token_type": "bearer",
+        "user_role": user.role.value
+    }
+
+@app.get("/api/auth/me")
+async def get_current_user_info(current_user: User = Depends(get_current_user)):
+    return {
+        "id": current_user.id,
+        "email": current_user.email,
+        "full_name": current_user.full_name,
+        "role": current_user.role.value,
+        "is_verified": current_user.is_verified
+    }
+
 @app.post("/api/documents/generate")
-async def generate_document(request: DocumentRequest) -> DocumentResponse:
+async def generate_document(
+    request: DocumentRequest, 
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+) -> DocumentResponse:
     try:
+        high_risk_templates = [
+            "criminal_charges_police", "criminal_charges_prosecutor", "criminal_charges_court",
+            "constitutional_challenge", "urgent_eviction_application", "asset_preservation_order",
+            "corruption_report", "trust_accounting_demand"
+        ]
+        
+        if request.document_type in high_risk_templates:
+            template = db.query(DocumentTemplate).filter(
+                DocumentTemplate.template_name == request.document_type
+            ).first()
+            
+            if not template or not template.is_active:
+                raise HTTPException(
+                    status_code=status.HTTP_403_FORBIDDEN,
+                    detail=f"⚠️ LEGAL REVIEW REQUIRED: The '{request.document_type}' template has not been approved by legal practitioners and cannot be used for actual legal proceedings. Please consult with a qualified attorney."
+                )
+        
         result = await document_service.generate_document(
             document_type=request.document_type,
             user_details=request.user_details.dict(),
             case_details=request.case_details.dict(),
-            ai_enhancement=request.ai_enhancement
+            ai_enhancement=request.ai_enhancement,
+            user_id=current_user.id
         )
+        
+        legal_disclaimer = """
+
+⚖️ LEGAL NOTICE: This document has been generated using AI assistance. While our templates undergo legal review, this does not constitute legal advice. Users should consult with qualified attorneys for specific legal guidance and before using any document in legal proceedings.
+
+🔒 PRIVACY NOTICE: Your personal information is encrypted and protected according to our privacy policy.
+
+🌍 OPEN SOURCE: This platform is completely free and open source to ensure universal access to constitutional justice tools.
+"""
+        
+        result["content"] += legal_disclaimer
         return DocumentResponse(**result)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -95,8 +229,74 @@ async def get_document_types():
         ]
     }
 
+@app.get("/api/legal/templates")
+async def get_template_approval_status(
+    current_user: User = Depends(require_roles([UserRole.REVIEWER, UserRole.LAWYER, UserRole.ADMIN])),
+    db: Session = Depends(get_db)
+):
+    templates = db.query(DocumentTemplate).all()
+    return [
+        {
+            "id": template.id,
+            "name": template.template_name,
+            "type": template.template_type,
+            "version": template.version,
+            "is_active": template.is_active,
+            "risk_level": template.risk_level,
+            "requires_review": template.requires_legal_review,
+            "approval_count": len([a for a in template.approvals if a.status == ReviewStatus.APPROVED])
+        }
+        for template in templates
+    ]
+
+@app.post("/api/legal/templates/{template_id}/approve")
+async def approve_template(
+    template_id: int,
+    approval_data: dict,
+    current_user: User = Depends(require_role(UserRole.REVIEWER)),
+    db: Session = Depends(get_db)
+):
+    reviewer = db.query(LegalReviewer).filter(
+        LegalReviewer.user_id == current_user.id,
+        LegalReviewer.is_active == True
+    ).first()
+    
+    if not reviewer:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Only qualified legal reviewers can approve templates"
+        )
+    
+    template = db.query(DocumentTemplate).filter(DocumentTemplate.id == template_id).first()
+    if not template:
+        raise HTTPException(status_code=404, detail="Template not found")
+    
+    approval = TemplateApproval(
+        template_id=template_id,
+        reviewer_id=reviewer.id,
+        status=ReviewStatus(approval_data.get("status", "approved")),
+        review_notes=approval_data.get("notes", ""),
+        legal_compliance_score=approval_data.get("compliance_score", 8),
+        constitutional_compliance=approval_data.get("constitutional_compliance", True),
+        statutory_compliance=approval_data.get("statutory_compliance", True),
+        procedural_compliance=approval_data.get("procedural_compliance", True),
+        reviewed_at=datetime.utcnow()
+    )
+    
+    db.add(approval)
+    
+    if approval.status == ReviewStatus.APPROVED:
+        template.is_active = True
+    
+    db.commit()
+    
+    return {"message": "Template approval recorded successfully"}
+
 @app.post("/api/constitutional/analyze")
-async def analyze_constitutional_compliance(request: ConstitutionalAnalysisRequest):
+async def analyze_constitutional_compliance(
+    request: ConstitutionalAnalysisRequest,
+    current_user: User = Depends(get_current_user)
+):
     try:
         result = await constitutional_service.analyze_compliance(
             law_text=request.law_text,

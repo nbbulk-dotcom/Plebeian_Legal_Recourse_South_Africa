@@ -54,7 +54,8 @@ class DocumentGeneratorService:
         document_type: str, 
         user_details: Dict[str, Any], 
         case_details: Dict[str, Any],
-        ai_enhancement: bool = True
+        ai_enhancement: bool = True,
+        user_id: int = None
     ) -> Dict[str, Any]:
         
         document_id = str(uuid.uuid4())
@@ -85,7 +86,8 @@ class DocumentGeneratorService:
             "file_path": file_path,
             "ai_enhancements": ai_enhancements,
             "legal_analysis": legal_analysis,
-            "generated_at": datetime.now()
+            "generated_at": datetime.now(),
+            "user_id": user_id
         }
 
     async def _generate_base_document(

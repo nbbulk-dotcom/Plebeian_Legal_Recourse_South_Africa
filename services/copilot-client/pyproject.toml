@@ -1,0 +1,22 @@
+[tool.poetry]
+name = "copilot-client"
+version = "0.1.0"
+description = "Copilot client proxy for Constitutional Liberation Platform"
+authors = ["nicolas <nbbulk@gmail.com>"]
+
+[tool.poetry.dependencies]
+python = ">=3.11,<3.13"
+fastapi = "0.100.0"
+httpx = "0.24.1"
+sqlalchemy = "2.0.20"
+alembic = "1.12.0"
+pydantic = "1.10.9"
+psycopg2-binary = "2.9.7"
+python-dotenv = "1.0.0"
+uvicorn = "0.22.0"
+tenacity = "8.2.2"
+
+[tool.poetry.dev-dependencies]
+pytest = "7.4.0"
+pytest-asyncio = "0.21.0"
+httpx = "0.24.1"

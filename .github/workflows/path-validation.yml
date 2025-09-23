@@ -1,0 +1,57 @@
+name: Validate paths and pinned versions
+
+on:
+  pull_request:
+    paths:
+      - '**/*'
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Validate Dockerfile base images pinned
+        run: |
+          set -e
+          found_unpinned=0
+          for f in $(git ls-files | grep -E '(^|/)Dockerfile|(^|/)\.dockerfile' || true); do
+            if grep -E -n '^FROM\s+(python|node|golang|ubuntu):' "$f" | grep -q -v -E ':[0-9]'; then
+              echo "Unpinned base image in $f" >&2
+              found_unpinned=1
+            fi
+          done
+          if [ "$found_unpinned" -ne 0 ]; then
+            echo "ERROR: One or more Dockerfiles use unpinned base images." >&2
+            exit 1
+          fi
+      - name: Detect relative/truncated runtime paths
+        run: |
+          set -e
+          if git grep -n --cached -E '\.\./|(^|/)\.\.(/|$)|\./[^/]' $(git ls-files) | grep -v '.github/workflows/path-validation.yml' >/dev/null 2>&1; then
+            echo "ERROR: Relative/truncated path references detected in repo files." >&2
+            git grep -n -E '\.\./|(^|/)\.\.(/|$)|\./[^/]' $(git ls-files) | grep -v '.github/workflows/path-validation.yml' || true
+            exit 1
+          fi
+      - name: Ensure backend entrypoint exists
+        run: |
+          if [ ! -f backend/app/main.py ]; then
+            echo "ERROR: backend/app/main.py not found" >&2
+            exit 1
+          fi
+      - name: Lint for floating version specifiers
+        run: |
+          set -e
+          bad=0
+          for f in pyproject.toml package.json backend/pyproject.toml frontend/package.json requirements.txt || true; do
+            if [ -f "$f" ]; then
+              if grep -E ">=|\\^|~|\"latest\"|:\\s*\"latest\"" "$f" >/dev/null 2>&1; then
+                echo "Floating version specifier found in $f" >&2
+                bad=1
+              fi
+            fi
+          done
+          if [ "$bad" -ne 0 ]; then
+            echo "ERROR: Floating/unpinned versions detected" >&2
+            exit 1
+          fi
