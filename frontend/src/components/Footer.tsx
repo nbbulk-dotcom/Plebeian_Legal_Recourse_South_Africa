@@ -1,5 +1,5 @@
+import React from "react";
 import { Link } from 'react-router-dom'
-import { ScaleIcon } from '@heroicons/react/24/outline'
 
 export default function Footer() {
   return (
@@ -8,7 +8,7 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div className="col-span-1 md:col-span-2">
             <div className="flex items-center space-x-2 mb-4">
-              <ScaleIcon className="h-8 w-8 text-constitutional-400" />
+              <span className="text-2xl">⚖️</span>
               <div>
                 <div className="text-lg font-bold">Constitutional Liberation Platform</div>
                 <div className="text-sm text-gray-400">Free Legal Justice for All</div>
