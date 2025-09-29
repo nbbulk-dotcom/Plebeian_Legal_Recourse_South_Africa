@@ -48,7 +48,12 @@ app.add_middleware(
 
 @app.on_event("startup")
 async def startup_event():
-    create_tables()
+    try:
+        create_tables()
+        print("✓ Database tables created successfully")
+    except Exception as e:
+        print(f"⚠️ Database connection failed: {e}")
+        print("⚠️ Backend will run in limited mode without database features")
 
 
 document_service = DocumentGeneratorService()
