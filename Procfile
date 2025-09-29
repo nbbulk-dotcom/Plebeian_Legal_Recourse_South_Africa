@@ -1,1 +1,1 @@
-web: python /app/backend/run.py
+web: python /app/backend/entrypoint.py
